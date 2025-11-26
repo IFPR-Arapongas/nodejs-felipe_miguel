@@ -19,7 +19,7 @@ app.post("/adicionar", (req, res) => {
     const { nome_usuario, marca_chuteira } = req.body;
 
     const inserirUsuario = "INSERT INTO usuarios (email, senha) VALUES (?, ?)";
-    db.query(inserirUsuario, [${ nome_usuario }@teste.com, "12345"], (err, result) => {
+    db.query(inserirUsuario, [`${ nome_usuario }@teste.com`, "12345"], (err, result) => {
         if (err) throw err;
 
         const idUsuario = result.insertId;
