@@ -6,9 +6,8 @@ const app = express()
 const connection = await mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '',
-    port: '3306'
-})
+    password: ''
+});
 
 db.connect(err => {
     if (err) throw err;
