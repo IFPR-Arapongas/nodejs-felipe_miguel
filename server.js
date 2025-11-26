@@ -2,17 +2,13 @@ import express from 'express'
 import mysql from 'mysql2/promise';
 
 const app = express()
+app.use(express.json());
 
-const connection = await mysql.createConnection({
+const db = await mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: ''
-});
-
-db.connect(err => {
-    if (err) throw err;
-    console.log("MySQL conectado!");
-});
+    port: '3306'
+})
 
 app.post("/adicionar", (req, res) => {
     const { nome_usuario, marca_chuteira } = req.body;
@@ -39,7 +35,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(3000, () => {
-    console.log("Servidor rodando em http://localhost:3306");
+    console.log("Servidor rodando em http://localhost:3000");
 });
 
 
