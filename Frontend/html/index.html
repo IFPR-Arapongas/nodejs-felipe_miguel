@@ -17,19 +17,18 @@
             <a href="../html/form.html"><li>Login</li></a>
         </ul>
     </header>
-    
-    <form>
 
-        <h1 class="login">Favoritar</h1>
+    <form method="POST">
+        <label>Nome do Usuário:</label>
+        <input type="text" name="nome_usuario" id="nome" required>
 
-        <label for="nome">Nome</label>
-        <input type="text" id="nome" required>
+        <label>Marca da Chuteira:</label>
+        <input type="text" name="marca_chuteira" id="marca" required>
 
-        <label for="marca">Marca</label>
-        <input type="text" id="marca" required>
+        <label>Modelo da Chuteira:</label>
+        <input type="text" name="titulo_item" id="modelo" required>
 
-        <button id="adicionar">Adicionar</button>
-
+        <button id="adicionar">Salvar</button>
     </form>
 
     <h2>SEUS FAVORITOS</h2>
