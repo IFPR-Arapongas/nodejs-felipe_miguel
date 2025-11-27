@@ -90,6 +90,23 @@ button {
     transition: 0.5s;
 }
 
+#conteudo {
+    font-size: 18px;
+    display: grid;
+    justify-items: center;
+    color: #6cbdb5;
+    border: solid 20px;
+    border-radius: 20px;
+    border-color: #1a1f1e;
+    background-color: #1a1f1e;
+    width: 750px;
+    margin: auto;
+    margin-bottom: 80px;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 20px;
+    gap: 60px;
+}
+
 button:hover {
     transform: scale(1.2);
 }
