@@ -134,16 +134,20 @@ label:hover {
 
 }
 
-@media (max-width: 425px) {
+@media (max-width: 768px) {
 
-    .outlet {
-        font-size: 0px;
-        width: 0px;
+    #conteudo {
+        width: 600px;
     }
+
+}
+
+@media (max-width: 425px) {
 
     header {
         display: flex;
         align-items: center;
+        justify-content: space-around;
     }
 
     ul {
@@ -154,12 +158,17 @@ label:hover {
         width: 300px;
     }
 
+    #conteudo {
+        width: 200px;
+        height: 60px;
+    }
+
 }
 
 @media (max-width: 375px) {
 
     header {
-        font-size: 15px;
+        font-size: 10px;
     }
 
     form {
