@@ -3,11 +3,12 @@ import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
+import argon2 from 'argon2';
 
 const app = express()
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static('public'));
+app.use(express.static('Frontend'));
 
 dotenv.config();
 
@@ -64,29 +65,79 @@ function autenticarToken(req, res, next) {
   }
   
   app.post('/login', async (req, res) => {
-    let { email, senha } = req.body;
-  
-    if (email != 'teste@gmail.com' || senha !== '123456') {
-      return res.status(401).send({
-        auth: false,
-        mensagem: 'Usuário ou senha inválidos'
-      })
+    const { email, password } = req.body;
+
+    try {
+        
+        const [rows] = await db.query(
+            "SELECT id, senha FROM usuarios WHERE email = ?",
+            [email]
+        );
+
+        if (rows.length === 0) {
+            return res.status(401).send({ auth: false, mensagem: 'Usuário ou senha inválidos' });
+        }
+
+        const user = rows[0];
+        
+        const isPasswordValid = await argon2.verify(user.senha, password);
+
+        if (!isPasswordValid) {
+            return res.status(401).send({ auth: false, mensagem: 'Usuário ou senha inválidos' });
+        }
+        
+        let token = jwt.sign(
+             { email: email, id: user.id },
+             process.env.JWT_SECRET,
+             { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        res.cookie('authToken', token, {
+             httpOnly: true, 
+             maxAge: 24 * 3600000, 
+             sameSite: 'Lax',
+             secure: process.env.NODE_ENV === 'production' 
+        });
+        res.status(200).send({ auth: true, message: 'Login realizado com sucesso' });
+
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).send({ auth: false, message: 'Erro interno do servidor' });
     }
-  
-    let token = jwt.sign(
-      { email: email },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+});
+
+app.post('/cadastro', async (req, res) => {
+  try {
+    
+    const hashedPassword = await argon2.hash(password);
+
+    const [existingUsers] = await db.query(
+        "SELECT id FROM usuarios WHERE email = ?",
+        [email]
     );
-  
-    res.cookie('authToken', token, {
-      httpOnly: true, 
-      maxAge: 24 * 3600000, 
-      sameSite: 'Lax'
+    if (existingUsers.length > 0) {
+        return res.status(409).send({ mensagem: 'Email já cadastrado.' });
+    }
+
+    const inserirUsuario = "INSERT INTO usuarios (email, senha) VALUES (?, ?)";
+    const [result] = await db.query(inserirUsuario, [email, hashedPassword]);
+    
+    res.status(201).send({ 
+        mensagem: 'Usuário registrado com sucesso!', 
+        id: result.insertId 
     });
-    res.status(200).send({ auth: true, message: 'Login realizado com sucesso' })
-})
 
+} catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).send({ mensagem: 'Erro interno do servidor durante o cadastro.' });
+}
+});
 
+dotenv.config(); // Make sure this is called early
 
-
+const db = await mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    port: process.env.DB_PORT,
+    // Using environment variable for the database name
+    **database: process.env.DB_NAME** });
