@@ -15,7 +15,8 @@ dotenv.config();
 const db = await mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    port: '3306'
+    port: '3306',
+    database: 'favorito_chuteira'
 })
 
 app.post("/adicionar", (req, res) => {
@@ -133,11 +134,4 @@ app.post('/cadastro', async (req, res) => {
 }
 });
 
-dotenv.config(); // Make sure this is called early
 
-const db = await mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    port: process.env.DB_PORT,
-    // Using environment variable for the database name
-    **database: process.env.DB_NAME** });
