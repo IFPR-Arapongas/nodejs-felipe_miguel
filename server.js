@@ -69,9 +69,9 @@ function autenticarToken(req, res, next) {
     const { email, password } = req.body;
 
     try {
-        
+
         const [rows] = await db.query(
-            "SELECT id, senha FROM usuarios WHERE email = ?",
+            "SELECT id_usuarios, senha FROM usuarios WHERE email = ?",
             [email]
         );
 
@@ -88,7 +88,7 @@ function autenticarToken(req, res, next) {
         }
         
         let token = jwt.sign(
-             { email: email, id: user.id },
+             { email: email, id: user.id_usuario }, 
              process.env.JWT_SECRET,
              { expiresIn: process.env.JWT_EXPIRES_IN }
         );
