@@ -70,7 +70,7 @@ function autenticarToken(req, res, next) {
 
     try {
 
-        const [rows] = await db.query(
+        const [rows] = await db.execute(
             "SELECT id_usuarios, senha FROM usuarios WHERE email = ?",
             [email]
         );
@@ -82,7 +82,7 @@ function autenticarToken(req, res, next) {
         const user = rows[0];
         
         const isPasswordValid = await argon2.verify(user.senha, password);
-
+        console.log(user.senha)
         if (!isPasswordValid) {
             return res.status(401).send({ auth: false, mensagem: 'Usuário ou senha inválidos' });
         }
@@ -108,30 +108,37 @@ function autenticarToken(req, res, next) {
 });
 
 app.post('/cadastro', async (req, res) => {
+  
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+      return res.status(400).send({ mensagem: 'Email e senha são obrigatórios.' });
+  }
+
   try {
-    
-    const hashedPassword = await argon2.hash(password);
+      
+      const [existingUsers] = await db.query(
+          "SELECT id_usuarios FROM usuarios WHERE email = '?'", 
+      );
+      
+      if (existingUsers.length > 0) {
+          return res.status(409).send({ mensagem: 'Email já cadastrado.' });
+      }
 
-    const [existingUsers] = await db.query(
-        "SELECT id FROM usuarios WHERE email = ?",
-        [email]
-    );
-    if (existingUsers.length > 0) {
-        return res.status(409).send({ mensagem: 'Email já cadastrado.' });
-    }
+      const hashedPassword = await argon2.hash(password);
 
-    const inserirUsuario = "INSERT INTO usuarios (email, senha) VALUES (?, ?)";
-    const [result] = await db.query(inserirUsuario, [email, hashedPassword]);
-    
-    res.status(201).send({ 
-        mensagem: 'Usuário registrado com sucesso!', 
-        id: result.insertId 
-    });
+      const inserirUsuario = "INSERT INTO usuarios (email, senha) VALUES (?, ?)";
+      const [result] = await db.query(inserirUsuario, [email, hashedPassword]);
+      
+      res.status(201).send({ 
+          mensagem: 'Usuário registrado com sucesso!', 
+          id: result.insertId 
+      });
 
-} catch (error) {
-    console.error("Registration error:", error);
-    res.status(500).send({ mensagem: 'Erro interno do servidor durante o cadastro.' });
-}
+  } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).send({ mensagem: 'Erro interno do servidor durante o cadastro.' });
+  }
 });
 
 
