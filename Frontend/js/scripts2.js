@@ -1,10 +1,10 @@
-const form2 = document.querySelector("#form2");
+const form1 = document.querySelector("#form1");
 
-form2.addEventListener("submit", async (event) => {
+form1.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const login = form2.elements.email.value;
-  const password = form2.elements.password.value;
+  const login = form1.elements.email.value;
+  const password = form1.elements.password.value;
 
   const header = {
     method: 'POST',
@@ -14,7 +14,7 @@ form2.addEventListener("submit", async (event) => {
     body: JSON.stringify({ email: login, password: password })
   }
 
-  const resposta = await fetch('/cadastro', header);
+  const resposta = await fetch('/login', header);
   const resultado = await resposta.json();
 
   if (resultado.auth) {
