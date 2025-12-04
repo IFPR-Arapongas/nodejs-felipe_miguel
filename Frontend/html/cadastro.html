@@ -16,16 +16,19 @@
         </ul>
     </header>
     
-    <form action="/cadastro" method="POST">
+    <form id="form2" method="POST">
         <h1 class="login">Cadastro</h1>
 
         <label for="email">E-mail</label>
         <input type="email" id="email" required placeholder="seuemail@dominio.com">
 
         <label for="Senha">Senha</label>
-        <input type="password" id="senha" required>
+        <input type="password" id="senha" required placeholder="senha">
 
-        <button type="submit" id="enviar">Enviar</button>
+        <button type="submit" id="enviar">Cadastrar</button>
+        <div id="mensagem">
+
+        </div>
 
     </form>
 
