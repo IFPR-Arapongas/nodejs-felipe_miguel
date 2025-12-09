@@ -11,3 +11,31 @@ document.querySelector('#adicionar').addEventListener('click', (e) => {
     div.append(p)
     conteudo.append(div)
 })
+
+const chuteira = document.querySelector("#chuteira");
+
+chuteira.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const nome = chuteira.elements.nome.value;
+  const marca = chuteira.elements.marca.value;
+
+  const header = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ nome: nome, marca_chuteira: marca })
+  }
+
+  const resposta = await fetch('/adicionar', header);
+  const resultado = await resposta.json();
+
+  if (resultado.auth) {
+    window.location.href = '../index.html';
+  } else {
+    const divMensagem = document.querySelector('#mensagem');
+    divMensagem.textContent = resultado.mensagem; 
+    divMensagem.style.display = 'block';
+  }
+})
