@@ -1,0 +1,15 @@
+CREATE TABLE usuarios (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE favoritos (
+    id_favorito INT PRIMARY KEY AUTO_INCREMENT,
+    id_usuario INT NOT NULL,
+    nome VARCHAR(255) NOT NULL,
+    marca_chuteira VARCHAR(255) NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;

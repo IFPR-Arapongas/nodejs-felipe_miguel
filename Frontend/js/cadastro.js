@@ -6,15 +6,12 @@ form2.addEventListener("submit", async (event) => {
   const login = form2.elements.email.value;
   const password = form2.elements.password.value;
 
-  const header = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ email: login, password: password })
-  }
-
-  const resposta = await fetch('/cadastro', header);
+  const resposta = await fetch('http://localhost:3000/cadastro', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include', //
+  body: JSON.stringify({ email: login, password: password })
+});
   const resultado = await resposta.json();
 
   if (resultado.auth) {

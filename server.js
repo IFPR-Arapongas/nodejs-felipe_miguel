@@ -4,8 +4,17 @@ import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import argon2 from 'argon2';
+import cors from 'cors';
 
 const app = express()
+
+app.use(cors({
+    origin: 'http://127.0.0.1:5500',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static('Frontend'));
@@ -40,7 +49,6 @@ function autenticarToken(req, res, next) {
 
 app.use('/adicionar', autenticarToken); 
 
-// Rota /adicionar: Utiliza as colunas id_usuario, nome e marca_chuteira
 app.post("/adicionar", async (req, res) => {
     const id_usuario = req.id_usuario; 
     const { nome, marca_chuteira } = req.body;
@@ -63,18 +71,17 @@ app.post("/adicionar", async (req, res) => {
     }
 });
 
-// Rota de Login: Utiliza as colunas id e senha da tabela usuarios
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
         const [rows] = await db.execute(
-            "SELECT id, senha FROM usuarios WHERE email = ?",
+            "SELECT id, senha FROM usuarios WHERE email = '?'",
             [email]
         );
 
         if (rows.length === 0) {
-            return res.status(401).send({ auth: false, mensagem: 'Usuário ou senha inválidos' });
+            return res.status(401).json({ auth: false, mensagem: 'Usuário ou senha inválidos' });
         }
 
         const user = rows[0];
@@ -82,7 +89,7 @@ app.post('/login', async (req, res) => {
         const isPasswordValid = await argon2.verify(user.senha, password);
         
         if (!isPasswordValid) {
-            return res.status(401).send({ auth: false, mensagem: 'Usuário ou senha inválidos' });
+            return res.status(401).json({ auth: false, mensagem: 'Usuário ou senha inválidos' });
         }
         
         let token = jwt.sign(
@@ -95,17 +102,17 @@ app.post('/login', async (req, res) => {
              httpOnly: true, 
              maxAge: 24 * 3600000, 
              sameSite: 'Lax',
-             secure: process.env.NODE_ENV === 'production' 
+             secure: false
         });
-        res.status(200).send({ auth: true, message: 'Login realizado com sucesso' });
+
+        return res.status(200).json({ auth: true, mensagem: 'Login realizado com sucesso!' });
 
     } catch (error) {
         console.error("Login error:", error);
-        res.status(500).send({ auth: false, message: 'Erro interno do servidor' });
+        return res.status(500).json({ auth: false, mensagem: 'Erro interno do servidor' });
     }
 });
 
-// Rota de Cadastro: Utiliza as colunas id, email e senha da tabela usuarios
 app.post('/cadastro', async (req, res) => {
     const { email, password } = req.body;
  
@@ -115,7 +122,7 @@ app.post('/cadastro', async (req, res) => {
  
     try {
         const [existingUsers] = await db.query(
-            "SELECT id FROM usuarios WHERE email = ?", 
+            "SELECT id FROM usuarios WHERE email = '?'", 
             [email]
         );
         
@@ -125,7 +132,7 @@ app.post('/cadastro', async (req, res) => {
  
         const hashedPassword = await argon2.hash(password);
  
-        const inserirUsuario = "INSERT INTO usuarios (email, senha) VALUES (?, ?)";
+        const inserirUsuario = "INSERT INTO usuarios (email, senha) VALUES ('?', '?')";
         const [result] = await db.query(inserirUsuario, [email, hashedPassword]);
         
         res.status(201).send({ 
@@ -168,3 +175,4 @@ export function verificarHeaderToken(req, res, next) {
         });
     }
 }
+
