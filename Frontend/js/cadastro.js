@@ -9,7 +9,7 @@ form2.addEventListener("submit", async (event) => {
   const resposta = await fetch('http://localhost:3000/cadastro', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  credentials: 'include', //
+  credentials: 'include', 
   body: JSON.stringify({ email: login, password: password })
 });
   const resultado = await resposta.json();
