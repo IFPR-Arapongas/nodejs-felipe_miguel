@@ -76,7 +76,7 @@ app.post('/login', async (req, res) => {
 
     try {
         const [rows] = await db.execute(
-            "SELECT id, senha FROM usuarios WHERE email = '?'",
+            "SELECT id, senha FROM usuarios WHERE email = ?",
             [email]
         );
 
@@ -100,7 +100,7 @@ app.post('/login', async (req, res) => {
 
         res.cookie('authToken', token, {
              httpOnly: true, 
-             maxAge: 24 * 3600000, 
+             maxAge: 24 * 3600000,
              sameSite: 'Lax',
              secure: false
         });
